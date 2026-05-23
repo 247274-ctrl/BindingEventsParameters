@@ -1,0 +1,32 @@
+:root {
+    --primary: #4f46e5;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg: #f8fafc;
+}
+
+body {
+    background-color: var(--bg);
+}
+
+/* Cards */
+.card {
+    border-radius: 12px;
+    transition: 0.2s;
+}
+
+    .card:hover {
+        transform: translateY(-3px);
+    }
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+}
+
+/* List items */
+.list-group-item {
+    border-radius: 10px !important;
+    margin-bottom: 8px;
+}

@@ -1,0 +1,156 @@
+﻿@page "/ToDoPage"
+@using BindingEventsParameters.Classes
+@rendermode InteractiveServer
+
+<h3 class="mb-3">ToDo Dashboard</h3>
+
+<!-- ================= THEME SELECTOR (RESTORED) ================= -->
+<div class="mb-3">
+
+    <label class="form-label">Theme Color</label>
+
+    <select class="form-control w-25"
+            @bind="SelectedColor">
+
+        <option value="green">Green</option>
+        <option value="red">Red</option>
+        <option value="blue">Blue</option>
+
+    </select>
+
+</div>
+
+<!-- ================= FILTER BUTTONS ================= -->
+<div class="mb-3">
+
+    <button class="btn btn-outline-primary me-2"
+            @onclick='() => SetFilter("All")'>
+        All (@Tasks.Count)
+    </button>
+
+    <button class="btn btn-outline-warning me-2"
+            @onclick='() => SetFilter("Pending")'>
+        Pending (@Tasks.Count(x => !x.IsComplete))
+    </button>
+
+    <button class="btn btn-outline-success"
+            @onclick='() => SetFilter("Completed")'>
+        Completed (@Tasks.Count(x => x.IsComplete))
+    </button>
+
+</div>
+
+<!-- ================= PROGRESS BAR ================= -->
+<div class="mb-4">
+    <div class="progress" style="height: 25px;">
+        <div class="progress-bar bg-success"
+             style="width:@ProgressPercentage%">
+            @ProgressPercentage.ToString("0")%
+        </div>
+    </div>
+</div>
+
+<!-- ================= TASK LIST ================= -->
+<ul class="list-group mb-4">
+
+    @foreach (var task in FilteredTasks)
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+
+            <div>
+                <input type="checkbox"
+                       class="form-check-input me-2"
+                       @bind="task.IsComplete" />
+
+                <span style="@(task.IsComplete
+                    ? $"text-decoration:line-through;color:{SelectedColor};"
+                    : $"color:{SelectedColor};")">
+
+                    @task.TaskDescription
+                </span>
+            </div>
+
+            <button class="btn btn-sm btn-danger"
+                    @onclick="() => RemoveTask(task)">
+                Delete
+            </button>
+
+        </li>
+    }
+
+</ul>
+
+<!-- ================= ADD TASK ================= -->
+<div class="row g-2">
+
+    <div class="col">
+        <input class="form-control"
+               placeholder="Add new task..."
+               @bind="newTaskDescription" />
+    </div>
+
+    <div class="col-auto">
+        <button class="btn btn-primary"
+                @onclick="AddTask">
+            Add
+        </button>
+    </div>
+
+</div>
+
+@code {
+
+    // ================= DATA =================
+    private List<TaskItem> Tasks = new();
+    private string newTaskDescription;
+    private string selectedFilter = "All";
+
+    // RESTORED THEME COLOR
+    private string SelectedColor { get; set; } = "green";
+
+    // ================= INIT =================
+    protected override void OnInitialized()
+    {
+        Tasks.Add(new TaskItem { TaskDescription = "Learn Blazor", IsComplete = false });
+        Tasks.Add(new TaskItem { TaskDescription = "Build ToDo App", IsComplete = true });
+    }
+
+    // ================= FILTER =================
+    private void SetFilter(string filter)
+    {
+        selectedFilter = filter;
+    }
+
+    private IEnumerable<TaskItem> FilteredTasks =>
+        selectedFilter switch
+        {
+            "Pending" => Tasks.Where(x => !x.IsComplete),
+            "Completed" => Tasks.Where(x => x.IsComplete),
+            _ => Tasks
+        };
+
+    // ================= PROGRESS =================
+    private double ProgressPercentage =>
+        Tasks.Count == 0 ? 0 :
+        (Tasks.Count(x => x.IsComplete) * 100.0 / Tasks.Count);
+
+    // ================= ACTIONS =================
+    private void AddTask()
+    {
+        if (!string.IsNullOrWhiteSpace(newTaskDescription))
+        {
+            Tasks.Add(new TaskItem
+                {
+                    TaskDescription = newTaskDescription,
+                    IsComplete = false
+                });
+
+            newTaskDescription = string.Empty;
+        }
+    }
+
+    private void RemoveTask(TaskItem task)
+    {
+        Tasks.Remove(task);
+    }
+}

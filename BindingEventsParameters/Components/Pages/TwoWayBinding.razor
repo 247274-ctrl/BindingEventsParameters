@@ -1,0 +1,13 @@
+﻿@page "/twoway"
+
+<h3>Two Way Binding</h3>
+
+<p>Slider Value: <b>@SliderValue</b></p>
+
+<input type="range" step="1"
+       @bind-value="SliderValue"
+       @bind-value:event="oninput" />
+
+@code {
+    int SliderValue = 0;
+}
